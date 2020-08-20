@@ -276,9 +276,18 @@ open class SheetViewController: UIViewController {
     
     private func setUpDismissView() {
         let dismissAreaView = UIView(frame: CGRect.zero)
-        self.containerView.addSubview(dismissAreaView) { (dismissAreaView) in
-            dismissAreaView.edges(.top, .left, .right, .bottom).pinToSuperview()
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            self.containerView.addSubview(dismissAreaView) { (dismissAreaView) in
+                dismissAreaView.edges(.top, .left, .right, .bottom).pinToSuperview()
+            }
+        } else {
+            self.view.addSubview(dismissAreaView, containerView) { (dismissAreaView, containerView) in
+                dismissAreaView.edges(.top, .left, .right).pinToSuperview()
+                dismissAreaView.bottom.align(with: containerView.top)
+            }
         }
+    
         dismissAreaView.backgroundColor = UIColor.clear
         dismissAreaView.isUserInteractionEnabled = true
         
