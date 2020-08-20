@@ -224,7 +224,12 @@ open class SheetViewController: UIViewController {
         self.addChild(self.childViewController)
         let bottomInset = self.safeAreaInsets.bottom
         self.containerView.addSubview(self.childViewController.view) { (subview) in
-            subview.edges(.left, .right).pinToSuperview()
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                subview.width.set(UIScreen.main.bounds.width - 200)
+                subview.center.alignWithSuperview()
+            } else {
+                subview.edges(.left, .right).pinToSuperview()
+            }
             if self.adjustForBottomSafeArea {
                 subview.bottom.pinToSuperview(inset: bottomInset, relation: .equal)
             } else {
@@ -263,14 +268,16 @@ open class SheetViewController: UIViewController {
             controllerWithRoundedCorners?.layer.cornerRadius = self.topCornersRadius
             controllerWithoutRoundedCorners?.layer.maskedCorners = []
             controllerWithoutRoundedCorners?.layer.cornerRadius = 0
+        } else {
+            let controllerWithRoundedCorners = extendBackgroundBehindHandle ? self.containerView : self.childViewController.view
+            controllerWithRoundedCorners?.layer.cornerRadius = topCornersRadius
         }
     }
     
     private func setUpDismissView() {
         let dismissAreaView = UIView(frame: CGRect.zero)
-        self.view.addSubview(dismissAreaView, containerView) { (dismissAreaView, containerView) in
-            dismissAreaView.edges(.top, .left, .right).pinToSuperview()
-            dismissAreaView.bottom.align(with: containerView.top)
+        self.containerView.addSubview(dismissAreaView) { (dismissAreaView) in
+            dismissAreaView.edges(.top, .left, .right, .bottom).pinToSuperview()
         }
         dismissAreaView.backgroundColor = UIColor.clear
         dismissAreaView.isUserInteractionEnabled = true
